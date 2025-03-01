@@ -82,6 +82,9 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
           if (positionY <= 0) {
             phase = 0;
             resetCountdown();
+            positionX = 0;
+            positionY = 0;
+            dynamicBoxSize = minBoxSize;
           }
         }
       });
@@ -110,78 +113,86 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
           ),
         ),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Stack(
+            alignment: Alignment.center,
             children: [
-              Text(
-                phase == 0
-                    ? "Inhale"
-                    : phase == 1
-                        ? "Hold"
-                        : phase == 2
-                            ? "Exhale"
-                            : "Hold",
-                style: TextStyle(
-                  color: Colors.cyanAccent,
-                  fontSize: textSize,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
-                  ],
-                ),
-              ),
-              SizedBox(height: 20),
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    width: outerBoxSize,
-                    height: outerBoxSize,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white, width: lineThickness),
-                      color: Colors.transparent, // No internal color
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blueAccent.withOpacity(0.5),
-                          blurRadius: 15,
-                          spreadRadius: 2,
-                        ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 50.0),
+                  child: Text(
+                    phase == 0
+                        ? "Inhale"
+                        : phase == 1
+                            ? "Hold"
+                            : phase == 2
+                                ? "Exhale"
+                                : "Hold",
+                    style: TextStyle(
+                      color: Colors.cyanAccent,
+                      fontSize: textSize,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
                       ],
                     ),
                   ),
-                  Positioned(
-                    left: positionX,
-                    top: positionY,
-                    child: Container(
-                      width: dynamicBoxSize,
-                      height: dynamicBoxSize,
+                ),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: outerBoxSize,
+                      height: outerBoxSize,
                       decoration: BoxDecoration(
-                        color: Colors.redAccent,
-                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Colors.white, width: lineThickness),
+                        color: Colors.transparent, // No internal color
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.redAccent.withOpacity(0.7),
-                            blurRadius: 10,
-                            spreadRadius: 1,
+                            color: Colors.blueAccent.withOpacity(0.5),
+                            blurRadius: 15,
+                            spreadRadius: 2,
                           ),
                         ],
                       ),
                     ),
-                  ),
-                  Positioned(
-                    child: Text(
-                      '$countdown',
-                      style: TextStyle(
-                        color: Colors.cyanAccent,
-                        fontSize: textSize,
-                        fontWeight: FontWeight.bold,
-                        shadows: [
-                          Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
-                        ],
+                    Positioned(
+                      left: positionX,
+                      top: positionY,
+                      child: Container(
+                        width: dynamicBoxSize,
+                        height: dynamicBoxSize,
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(4),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.redAccent.withOpacity(0.7),
+                              blurRadius: 10,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    Positioned(
+                      child: Text(
+                        '$countdown',
+                        style: TextStyle(
+                          color: Colors.cyanAccent,
+                          fontSize: textSize,
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
