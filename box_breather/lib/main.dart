@@ -11,7 +11,29 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: BoxBreathingScreen(),
+      home: MainMenu(),
+    );
+  }
+}
+
+class MainMenu extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Main Menu'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => BoxBreathingScreen()),
+            );
+          },
+          child: Text('Breath'),
+        ),
+      ),
     );
   }
 }
@@ -104,6 +126,9 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
     double textSize = baseTextSize + (maxTextSize - baseTextSize) * textScale;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Box Breathing'),
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
