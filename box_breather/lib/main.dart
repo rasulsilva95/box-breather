@@ -22,18 +22,118 @@ class MainMenu extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Main Menu'),
+        backgroundColor: Colors.blueGrey.shade900,
       ),
-      body: Center(
-        child: ElevatedButton(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.black, Colors.blueGrey.shade900],
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(
+                children: [
+                  Text(
+                    'Box',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 48, // Increased font size
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Container(
+                    width: 200, // Increased width
+                    height: 200, // Increased height
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 4), // Increased border width
+                      color: Colors.transparent, // No internal color
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blueAccent.withOpacity(0.5),
+                          blurRadius: 30, // Increased blur radius
+                          spreadRadius: 4, // Increased spread radius
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Breather',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 36, // Increased font size
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 40), // Increased spacing
+              AnimatedButton(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AnimatedButton extends StatefulWidget {
+  @override
+  _AnimatedButtonState createState() => _AnimatedButtonState();
+}
+
+class _AnimatedButtonState extends State<AnimatedButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.0, end: 10.0).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black, // Button color
+            foregroundColor: Colors.white, // Text color
+            side: BorderSide(color: Colors.blueAccent, width: 4), // Increased outline width
+            shadowColor: Colors.blueAccent.withOpacity(0.5),
+            elevation: _animation.value,
+            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20), // Increased padding
+          ),
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => BoxBreathingScreen()),
             );
           },
-          child: Text('Breath'),
-        ),
-      ),
+          child: Text(
+            'Breath',
+            style: TextStyle(fontSize: 24), // Increased font size
+          ),
+        );
+      },
     );
   }
 }
@@ -46,18 +146,18 @@ class BoxBreathingScreen extends StatefulWidget {
 class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
   double positionX = 0;
   double positionY = 0;
-  double dynamicBoxSize = 8;
-  static const double outerBoxSize = 150;
+  double dynamicBoxSize = 10; // Further decreased initial size
+  static const double outerBoxSize = 200; // Further decreased outer box size
   int phase = 0;
   int countdown = 1;
   late Timer timer;
   static const int duration = 4; // 4 seconds per phase
-  static const double minBoxSize = 8;
-  static const double maxBoxSize = 16;
-  static const double lineThickness = 3;
+  static const double minBoxSize = 10; // Further decreased min box size
+  static const double maxBoxSize = 20; // Further decreased max box size
+  static const double lineThickness = 3; // Further decreased line thickness
   double elapsedTime = 0;
-  double baseTextSize = 28;
-  double maxTextSize = 42;
+  double baseTextSize = 30; // Further decreased base text size
+  double maxTextSize = 45; // Further decreased max text size
 
   @override
   void initState() {
@@ -128,6 +228,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Box Breathing'),
+        backgroundColor: Colors.blueGrey.shade900,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -144,7 +245,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
               Align(
                 alignment: Alignment.topCenter,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 50.0),
+                  padding: const EdgeInsets.only(top: 60.0), // Further decreased padding
                   child: Text(
                     phase == 0
                         ? "Inhale"
@@ -154,7 +255,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
                                 ? "Exhale"
                                 : "Hold",
                     style: TextStyle(
-                      color: Colors.cyanAccent,
+                      color: Colors.white, // Changed to white
                       fontSize: textSize,
                       fontWeight: FontWeight.bold,
                       shadows: [
@@ -178,8 +279,8 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
                         boxShadow: [
                           BoxShadow(
                             color: Colors.blueAccent.withOpacity(0.5),
-                            blurRadius: 15,
-                            spreadRadius: 2,
+                            blurRadius: 15, // Further decreased blur radius
+                            spreadRadius: 1, // Further decreased spread radius
                           ),
                         ],
                       ),
@@ -192,12 +293,12 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
                         height: dynamicBoxSize,
                         decoration: BoxDecoration(
                           color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(4), // Further decreased border radius
                           boxShadow: [
                             BoxShadow(
                               color: Colors.redAccent.withOpacity(0.7),
-                              blurRadius: 10,
-                              spreadRadius: 1,
+                              blurRadius: 10, // Further decreased blur radius
+                              spreadRadius: 1, // Further decreased spread radius
                             ),
                           ],
                         ),
@@ -207,7 +308,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
                       child: Text(
                         '$countdown',
                         style: TextStyle(
-                          color: Colors.cyanAccent,
+                          color: Colors.white, // Changed to white
                           fontSize: textSize,
                           fontWeight: FontWeight.bold,
                           shadows: [
