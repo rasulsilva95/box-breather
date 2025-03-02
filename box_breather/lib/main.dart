@@ -42,27 +42,30 @@ class MainMenu extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Container(
-                    width: 200, // Increased width
-                    height: 200, // Increased height
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white, width: 4), // Increased border width
-                      color: Colors.transparent, // No internal color
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blueAccent.withOpacity(0.5),
-                          blurRadius: 30, // Increased blur radius
-                          spreadRadius: 4, // Increased spread radius
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Breather',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 36, // Increased font size
-                          fontWeight: FontWeight.bold,
+                  Hero(
+                    tag: 'outerBox',
+                    child: Container(
+                      width: 200, // Increased width
+                      height: 200, // Increased height
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white, width: 4), // Increased border width
+                        color: Colors.transparent, // No internal color
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blueAccent.withOpacity(0.5),
+                            blurRadius: 30, // Increased blur radius
+                            spreadRadius: 4, // Increased spread radius
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Breather',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 36, // Increased font size
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -121,7 +124,15 @@ class _AnimatedButtonState extends State<AnimatedButton> with SingleTickerProvid
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => BoxBreathingScreen()),
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => BoxBreathingScreen(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+              ),
             );
           },
           child: Text(
@@ -330,19 +341,22 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Container(
-                      width: outerBoxSize,
-                      height: outerBoxSize,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: lineThickness),
-                        color: Colors.transparent, // No internal color
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blueAccent.withOpacity(0.5),
-                            blurRadius: 15, // Further decreased blur radius
-                            spreadRadius: 1, // Further decreased spread radius
-                          ),
-                        ],
+                    Hero(
+                      tag: 'outerBox',
+                      child: Container(
+                        width: outerBoxSize,
+                        height: outerBoxSize,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white, width: lineThickness),
+                          color: Colors.transparent, // No internal color
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blueAccent.withOpacity(0.5),
+                              blurRadius: 15, // Further decreased blur radius
+                              spreadRadius: 1, // Further decreased spread radius
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Positioned(
