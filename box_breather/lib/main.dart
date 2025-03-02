@@ -20,10 +20,6 @@ class MainMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Main Menu'),
-        backgroundColor: Colors.blueGrey.shade900,
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -226,10 +222,6 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
     double textSize = baseTextSize + (maxTextSize - baseTextSize) * textScale;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Box Breathing'),
-        backgroundColor: Colors.blueGrey.shade900,
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -242,6 +234,15 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
           child: Stack(
             alignment: Alignment.center,
             children: [
+              Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back, color: Colors.white, size: 36), // Increased icon size
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
               Align(
                 alignment: Alignment.topCenter,
                 child: Padding(
