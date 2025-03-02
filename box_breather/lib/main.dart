@@ -147,7 +147,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
   int phase = 0;
   int countdown = 1;
   late Timer timer;
-  static const int duration = 4; // 4 seconds per phase
+  int duration = 4; // Default duration is 4 seconds
   static const double minBoxSize = 10; // Further decreased min box size
   static const double maxBoxSize = 20; // Further decreased max box size
   static const double lineThickness = 3; // Further decreased line thickness
@@ -215,6 +215,22 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
     super.dispose();
   }
 
+  void increaseDuration() {
+    setState(() {
+      if (duration < 10) {
+        duration++;
+      }
+    });
+  }
+
+  void decreaseDuration() {
+    setState(() {
+      if (duration > 1) {
+        duration--;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double cycle = elapsedTime / duration;
@@ -241,6 +257,49 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
+                ),
+              ),
+              Align(
+                alignment: Alignment.topRight,
+                child: PopupMenuButton<int>(
+                  icon: Icon(Icons.build, color: Colors.white, size: 36), // Wrench icon
+                  onSelected: (item) => onSelected(context, item),
+                  itemBuilder: (context) => [
+                    PopupMenuItem<int>(
+                      value: 0,
+                      child: StatefulBuilder(
+                        builder: (context, setState) {
+                          return Column(
+                            children: [
+                              Text('Duration'),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.remove),
+                                    onPressed: () {
+                                      setState(() {
+                                        decreaseDuration();
+                                      });
+                                    },
+                                  ),
+                                  Text('$duration'),
+                                  IconButton(
+                                    icon: Icon(Icons.add),
+                                    onPressed: () {
+                                      setState(() {
+                                        increaseDuration();
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Align(
@@ -326,5 +385,9 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
         ),
       ),
     );
+  }
+
+  void onSelected(BuildContext context, int item) {
+    // Handle menu item selection
   }
 }
