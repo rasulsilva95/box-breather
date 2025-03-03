@@ -27,7 +27,7 @@ class MyNavigatorObserver extends NavigatorObserver {
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     if (previousRoute?.settings.name == '/') {
-      mainMenuKey.currentState?._resetBreatherFadeIn();
+      mainMenuKey.currentState?._resetFadeIn(isInitial: false);
     }
   }
 }
@@ -39,31 +39,70 @@ class MainMenu extends StatefulWidget {
   _MainMenuState createState() => _MainMenuState();
 }
 
-class _MainMenuState extends State<MainMenu> {
+class _MainMenuState extends State<MainMenu> with SingleTickerProviderStateMixin {
   double breatherOpacity = 0.0;
+  double buttonOpacity = 0.0;
+  late AnimationController _controller;
+  late Animation<double> _blurRadiusAnimation;
+  late Animation<double> _spreadRadiusAnimation;
+  bool isInitial = true;
 
   @override
   void initState() {
     super.initState();
-    _startBreatherFadeIn();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _blurRadiusAnimation = Tween<double>(begin: 20.0, end: 50.0).animate(_controller);
+    _spreadRadiusAnimation = Tween<double>(begin: 2.0, end: 8.0).animate(_controller);
+
+    _startFadeIn();
   }
 
-  void _resetBreatherFadeIn() {
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _resetFadeIn({required bool isInitial}) {
     setState(() {
       breatherOpacity = 0.0;
+      buttonOpacity = 0.0;
+      this.isInitial = isInitial;
     });
 
     Future.delayed(Duration(milliseconds: 0), () {
-      _startBreatherFadeIn();
+      _startFadeIn();
     });
   }
 
-  void _startBreatherFadeIn() {
-    Future.delayed(Duration(milliseconds: 500), () {
-      setState(() {
-        breatherOpacity = 1.0;
+  void _startFadeIn() {
+    if (isInitial) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        setState(() {
+          breatherOpacity = 1.0;
+        });
       });
-    });
+      Future.delayed(Duration(milliseconds: 1000), () {
+        setState(() {
+          buttonOpacity = 1.0;
+        });
+      });
+    } else {
+      Future.delayed(Duration(milliseconds: 500), () {
+        setState(() {
+          breatherOpacity = 1.0;
+        });
+      });
+      Future.delayed(Duration(milliseconds: 100), () {
+        setState(() {
+          buttonOpacity = 1.0;
+        });
+      });
+    }
   }
 
   @override
@@ -94,40 +133,49 @@ class _MainMenuState extends State<MainMenu> {
                   SizedBox(height: 20), // Added spacing between texts
                   Hero(
                     tag: 'outerBox',
-                    child: Container(
-                      width: 200, // Increased width
-                      height: 200, // Increased height
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 4), // Increased border width
-                        color: Colors.transparent, // No internal color
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blueAccent.withOpacity(0.5),
-                            blurRadius: 30, // Increased blur radius
-                            spreadRadius: 4, // Increased spread radius
+                    child: AnimatedBuilder(
+                      animation: _controller,
+                      builder: (context, child) {
+                        return Container(
+                          width: 200, // Increased width
+                          height: 200, // Increased height
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white, width: 4), // Increased border width
+                            color: Colors.transparent, // No internal color
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.blueAccent.withOpacity(0.8), // Increased opacity
+                                blurRadius: _blurRadiusAnimation.value, // Animated blur radius
+                                spreadRadius: _spreadRadiusAnimation.value, // Animated spread radius
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: Center(
-                        child: AnimatedOpacity(
-                          opacity: breatherOpacity,
-                          duration: Duration(seconds: 1),
-                          child: Text(
-                            'Breather',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 36, // Increased font size
-                              fontWeight: FontWeight.bold,
+                          child: Center(
+                            child: AnimatedOpacity(
+                              opacity: breatherOpacity,
+                              duration: Duration(seconds: 1),
+                              child: Text(
+                                'Breather',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 36, // Increased font size
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ),
                 ],
               ),
               SizedBox(height: 40), // Increased spacing
-              AnimatedButton(),
+              AnimatedOpacity(
+                opacity: buttonOpacity,
+                duration: Duration(seconds: 1),
+                child: AnimatedButton(),
+              ),
             ],
           ),
         ),
@@ -204,7 +252,7 @@ class BoxBreathingScreen extends StatefulWidget {
   _BoxBreathingScreenState createState() => _BoxBreathingScreenState();
 }
 
-class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
+class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTickerProviderStateMixin {
   double positionX = 0;
   double positionY = 0;
   double dynamicBoxSize = 10; // Further decreased initial size
@@ -219,11 +267,29 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
   double elapsedTime = 0;
   double baseTextSize = 30; // Further decreased base text size
   double maxTextSize = 45; // Further decreased max text size
+  late AnimationController _controller;
+  late Animation<double> _blurRadiusAnimation;
+  late Animation<double> _spreadRadiusAnimation;
 
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _blurRadiusAnimation = Tween<double>(begin: 20.0, end: 50.0).animate(_controller);
+    _spreadRadiusAnimation = Tween<double>(begin: 2.0, end: 8.0).animate(_controller);
+
     startBreathingAnimation();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    timer.cancel();
+    super.dispose();
   }
 
   void resetCountdown() {
@@ -272,12 +338,6 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
         }
       });
     });
-  }
-
-  @override
-  void dispose() {
-    timer.cancel();
-    super.dispose();
   }
 
   void increaseDuration() {
@@ -403,20 +463,25 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
                   children: [
                     Hero(
                       tag: 'outerBox',
-                      child: Container(
-                        width: outerBoxSize,
-                        height: outerBoxSize,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white, width: lineThickness),
-                          color: Colors.transparent, // No internal color
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.blueAccent.withOpacity(0.5),
-                              blurRadius: 15, // Further decreased blur radius
-                              spreadRadius: 1, // Further decreased spread radius
+                      child: AnimatedBuilder(
+                        animation: _controller,
+                        builder: (context, child) {
+                          return Container(
+                            width: outerBoxSize,
+                            height: outerBoxSize,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white, width: lineThickness),
+                              color: Colors.transparent,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.blueAccent.withOpacity(0.8),
+                                  blurRadius: _blurRadiusAnimation.value,
+                                  spreadRadius: _spreadRadiusAnimation.value,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
                     ),
                     Positioned(
