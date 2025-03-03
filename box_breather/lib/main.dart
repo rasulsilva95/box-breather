@@ -7,16 +7,65 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final GlobalKey<_MainMenuState> mainMenuKey = GlobalKey<_MainMenuState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainMenu(),
+      home: MainMenu(key: mainMenuKey),
+      navigatorObservers: [MyNavigatorObserver(mainMenuKey)],
     );
   }
 }
 
-class MainMenu extends StatelessWidget {
+class MyNavigatorObserver extends NavigatorObserver {
+  final GlobalKey<_MainMenuState> mainMenuKey;
+
+  MyNavigatorObserver(this.mainMenuKey);
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (previousRoute?.settings.name == '/') {
+      mainMenuKey.currentState?._resetBreatherFadeIn();
+    }
+  }
+}
+
+class MainMenu extends StatefulWidget {
+  MainMenu({Key? key}) : super(key: key);
+
+  @override
+  _MainMenuState createState() => _MainMenuState();
+}
+
+class _MainMenuState extends State<MainMenu> {
+  double breatherOpacity = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _startBreatherFadeIn();
+  }
+
+  void _resetBreatherFadeIn() {
+    setState(() {
+      breatherOpacity = 0.0;
+    });
+
+    Future.delayed(Duration(milliseconds: 0), () {
+      _startBreatherFadeIn();
+    });
+  }
+
+  void _startBreatherFadeIn() {
+    Future.delayed(Duration(milliseconds: 500), () {
+      setState(() {
+        breatherOpacity = 1.0;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,6 +91,7 @@ class MainMenu extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  SizedBox(height: 20), // Added spacing between texts
                   Hero(
                     tag: 'outerBox',
                     child: Container(
@@ -59,12 +109,16 @@ class MainMenu extends StatelessWidget {
                         ],
                       ),
                       child: Center(
-                        child: Text(
-                          'Breather',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 36, // Increased font size
-                            fontWeight: FontWeight.bold,
+                        child: AnimatedOpacity(
+                          opacity: breatherOpacity,
+                          duration: Duration(seconds: 1),
+                          child: Text(
+                            'Breather',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 36, // Increased font size
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -136,7 +190,7 @@ class _AnimatedButtonState extends State<AnimatedButton> with SingleTickerProvid
             );
           },
           child: Text(
-            'Breath',
+            'Breathe',
             style: TextStyle(fontSize: 24), // Increased font size
           ),
         );
@@ -263,54 +317,60 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> {
             children: [
               Align(
                 alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white, size: 36), // Increased icon size
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 40.0), // Added padding to move the icon lower
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white, size: 36), // Increased icon size
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
                 ),
               ),
               Align(
                 alignment: Alignment.topRight,
-                child: PopupMenuButton<int>(
-                  icon: Icon(Icons.build, color: Colors.white, size: 36), // Wrench icon
-                  onSelected: (item) => onSelected(context, item),
-                  itemBuilder: (context) => [
-                    PopupMenuItem<int>(
-                      value: 0,
-                      child: StatefulBuilder(
-                        builder: (context, setState) {
-                          return Column(
-                            children: [
-                              Text('Duration'),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.remove),
-                                    onPressed: () {
-                                      setState(() {
-                                        decreaseDuration();
-                                      });
-                                    },
-                                  ),
-                                  Text('$duration'),
-                                  IconButton(
-                                    icon: Icon(Icons.add),
-                                    onPressed: () {
-                                      setState(() {
-                                        increaseDuration();
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          );
-                        },
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 40.0), // Added padding to move the icon lower
+                  child: PopupMenuButton<int>(
+                    icon: Icon(Icons.build, color: Colors.white, size: 36), // Wrench icon
+                    onSelected: (item) => onSelected(context, item),
+                    itemBuilder: (context) => [
+                      PopupMenuItem<int>(
+                        value: 0,
+                        child: StatefulBuilder(
+                          builder: (context, setState) {
+                            return Column(
+                              children: [
+                                Text('Duration'),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.remove),
+                                      onPressed: () {
+                                        setState(() {
+                                          decreaseDuration();
+                                        });
+                                      },
+                                    ),
+                                    Text('$duration'),
+                                    IconButton(
+                                      icon: Icon(Icons.add),
+                                      onPressed: () {
+                                        setState(() {
+                                          increaseDuration();
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               Align(
