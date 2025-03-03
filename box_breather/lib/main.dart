@@ -97,7 +97,7 @@ class _MainMenuState extends State<MainMenu> with SingleTickerProviderStateMixin
           breatherOpacity = 1.0;
         });
       });
-      Future.delayed(Duration(milliseconds: 100), () {
+      Future.delayed(Duration(milliseconds: 1000), () {
         setState(() {
           buttonOpacity = 1.0;
         });
@@ -270,6 +270,8 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
   late AnimationController _controller;
   late Animation<double> _blurRadiusAnimation;
   late Animation<double> _spreadRadiusAnimation;
+  int preCountdown = 3; // Initial countdown value
+  bool isPreCountdown = true;
 
   @override
   void initState() {
@@ -282,7 +284,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
     _blurRadiusAnimation = Tween<double>(begin: 20.0, end: 50.0).animate(_controller);
     _spreadRadiusAnimation = Tween<double>(begin: 2.0, end: 8.0).animate(_controller);
 
-    startBreathingAnimation();
+    startPreCountdown();
   }
 
   @override
@@ -290,6 +292,20 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
     _controller.dispose();
     timer.cancel();
     super.dispose();
+  }
+
+  void startPreCountdown() {
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (preCountdown > 1) {
+          preCountdown--;
+        } else {
+          timer.cancel();
+          isPreCountdown = false;
+          startBreathingAnimation();
+        }
+      });
+    });
   }
 
   void resetCountdown() {
@@ -438,13 +454,15 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                 child: Padding(
                   padding: const EdgeInsets.only(top: 60.0), // Further decreased padding
                   child: Text(
-                    phase == 0
-                        ? "Inhale"
-                        : phase == 1
-                            ? "Hold"
-                            : phase == 2
-                                ? "Exhale"
-                                : "Hold",
+                    isPreCountdown
+                        ? "$preCountdown"
+                        : phase == 0
+                            ? "Inhale"
+                            : phase == 1
+                                ? "Hold"
+                                : phase == 2
+                                    ? "Exhale"
+                                    : "Hold",
                     style: TextStyle(
                       color: Colors.white, // Changed to white
                       fontSize: textSize,
