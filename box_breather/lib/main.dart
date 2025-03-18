@@ -267,29 +267,30 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
   double elapsedTime = 0;
   double baseTextSize = 30; // Further decreased base text size
   double maxTextSize = 45; // Further decreased max text size
-  late AnimationController _controller;
+  late AnimationController _glowController;
   late Animation<double> _blurRadiusAnimation;
   late Animation<double> _spreadRadiusAnimation;
   int preCountdown = 3; // Initial countdown value
   bool isPreCountdown = true;
+  bool showPulse = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _glowController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat(reverse: true);
 
-    _blurRadiusAnimation = Tween<double>(begin: 20.0, end: 50.0).animate(_controller);
-    _spreadRadiusAnimation = Tween<double>(begin: 2.0, end: 8.0).animate(_controller);
+    _blurRadiusAnimation = Tween<double>(begin: 20.0, end: 50.0).animate(_glowController);
+    _spreadRadiusAnimation = Tween<double>(begin: 2.0, end: 8.0).animate(_glowController);
 
     startPreCountdown();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _glowController.dispose();
     timer.cancel();
     super.dispose();
   }
@@ -302,6 +303,12 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
         } else {
           timer.cancel();
           isPreCountdown = false;
+          showPulse = true;
+          Future.delayed(Duration(milliseconds: 500), () {
+            setState(() {
+              showPulse = false;
+            });
+          });
           startBreathingAnimation();
         }
       });
@@ -324,31 +331,39 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
         dynamicBoxSize = minBoxSize + (maxBoxSize - minBoxSize) * progress;
         countdown = (elapsedTime ~/ 1) + 1;
 
+        double halfOuterBoxSize = outerBoxSize / 2;
+        double centerX = MediaQuery.of(context).size.width / 2;
+        double centerY = MediaQuery.of(context).size.height / 2;
+
         if (phase == 0) {
-          positionX += step;
-          if (positionX >= outerBoxSize - minBoxSize) {
+          positionX = centerX - halfOuterBoxSize + step * (elapsedTime * 25);
+          positionY = centerY - halfOuterBoxSize;
+          if (positionX >= centerX + halfOuterBoxSize - minBoxSize) {
             phase = 1;
             resetCountdown();
           }
         } else if (phase == 1) {
-          positionY += step;
-          if (positionY >= outerBoxSize - minBoxSize) {
+          positionX = centerX + halfOuterBoxSize - minBoxSize;
+          positionY = centerY - halfOuterBoxSize + step * (elapsedTime * 25);
+          if (positionY >= centerY + halfOuterBoxSize - minBoxSize) {
             phase = 2;
             resetCountdown();
           }
         } else if (phase == 2) {
-          positionX -= step;
-          if (positionX <= 0) {
+          positionX = centerX + halfOuterBoxSize - minBoxSize - step * (elapsedTime * 25);
+          positionY = centerY + halfOuterBoxSize - minBoxSize;
+          if (positionX <= centerX - halfOuterBoxSize) {
             phase = 3;
             resetCountdown();
           }
         } else if (phase == 3) {
-          positionY -= step;
-          if (positionY <= 0) {
+          positionX = centerX - halfOuterBoxSize;
+          positionY = centerY + halfOuterBoxSize - minBoxSize - step * (elapsedTime * 25);
+          if (positionY <= centerY - halfOuterBoxSize) {
             phase = 0;
             resetCountdown();
-            positionX = 0;
-            positionY = 0;
+            positionX = centerX - halfOuterBoxSize;
+            positionY = centerY - halfOuterBoxSize;
             dynamicBoxSize = minBoxSize;
           }
         }
@@ -409,6 +424,11 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                   padding: const EdgeInsets.only(top: 40.0), // Added padding to move the icon lower
                   child: PopupMenuButton<int>(
                     icon: Icon(Icons.build, color: Colors.white, size: 36), // Wrench icon
+                    color: Colors.blueGrey.shade900.withOpacity(0.8), // Match the color scheme and make it slightly transparent
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: Colors.white.withOpacity(0.5), width: 1), // Light outline
+                    ),
                     onSelected: (item) => onSelected(context, item),
                     itemBuilder: (context) => [
                       PopupMenuItem<int>(
@@ -417,21 +437,34 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                           builder: (context, setState) {
                             return Column(
                               children: [
-                                Text('Duration'),
+                                Text(
+                                  'Duration',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     IconButton(
-                                      icon: Icon(Icons.remove),
+                                      icon: Icon(Icons.remove, color: Colors.white),
                                       onPressed: () {
                                         setState(() {
                                           decreaseDuration();
                                         });
                                       },
                                     ),
-                                    Text('$duration'),
+                                    Text(
+                                      '$duration',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                      ),
+                                    ),
                                     IconButton(
-                                      icon: Icon(Icons.add),
+                                      icon: Icon(Icons.add, color: Colors.white),
                                       onPressed: () {
                                         setState(() {
                                           increaseDuration();
@@ -450,31 +483,6 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                 ),
               ),
               Align(
-                alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 60.0), // Further decreased padding
-                  child: Text(
-                    isPreCountdown
-                        ? "$preCountdown"
-                        : phase == 0
-                            ? "Inhale"
-                            : phase == 1
-                                ? "Hold"
-                                : phase == 2
-                                    ? "Exhale"
-                                    : "Hold",
-                    style: TextStyle(
-                      color: Colors.white, // Changed to white
-                      fontSize: textSize,
-                      fontWeight: FontWeight.bold,
-                      shadows: [
-                        Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Align(
                 alignment: Alignment.center,
                 child: Stack(
                   alignment: Alignment.center,
@@ -482,7 +490,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                     Hero(
                       tag: 'outerBox',
                       child: AnimatedBuilder(
-                        animation: _controller,
+                        animation: _glowController,
                         builder: (context, child) {
                           return Container(
                             width: outerBoxSize,
@@ -502,38 +510,60 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                         },
                       ),
                     ),
-                    Positioned(
-                      left: positionX,
-                      top: positionY,
-                      child: Container(
-                        width: dynamicBoxSize,
-                        height: dynamicBoxSize,
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(4), // Further decreased border radius
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.redAccent.withOpacity(0.7),
-                              blurRadius: 10, // Further decreased blur radius
-                              spreadRadius: 1, // Further decreased spread radius
-                            ),
-                          ],
+                    if (showPulse)
+                      Positioned.fill(
+                        child: PulseEffect(),
+                      ),
+                    if (isPreCountdown)
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          '$preCountdown',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 60,
+                            fontWeight: FontWeight.bold,
+                            shadows: [
+                              Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Positioned(
-                      child: Text(
-                        '$countdown',
-                        style: TextStyle(
-                          color: Colors.white, // Changed to white
-                          fontSize: textSize,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
-                          ],
+                    if (!isPreCountdown)
+                      Positioned(
+                        left: positionX,
+                        top: positionY,
+                        child: Container(
+                          width: dynamicBoxSize,
+                          height: dynamicBoxSize,
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent,
+                            borderRadius: BorderRadius.circular(4), // Further decreased border radius
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.redAccent.withOpacity(0.7),
+                                blurRadius: 10, // Further decreased blur radius
+                                spreadRadius: 1, // Further decreased spread radius
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
+                    if (!isPreCountdown)
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          '$countdown',
+                          style: TextStyle(
+                            color: Colors.white, // Changed to white
+                            fontSize: 60, // Increased font size
+                            fontWeight: FontWeight.bold,
+                            shadows: [
+                              Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
+                            ],
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -546,5 +576,53 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
 
   void onSelected(BuildContext context, int item) {
     // Handle menu item selection
+  }
+}
+
+class PulseEffect extends StatefulWidget {
+  @override
+  _PulseEffectState createState() => _PulseEffectState();
+}
+
+class _PulseEffectState extends State<PulseEffect> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    )..forward();
+
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Opacity(
+          opacity: 1.0 - _animation.value,
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              border: Border.all(
+                color: Colors.blueAccent.withOpacity(0.8),
+                width: 4.0 * _animation.value,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
