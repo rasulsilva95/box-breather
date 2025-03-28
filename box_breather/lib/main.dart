@@ -273,6 +273,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
   int preCountdown = 3; // Initial countdown value
   bool isPreCountdown = true;
   bool showPulse = false;
+  bool showInfoOverlay = true; // Show the informational overlay initially
 
   @override
   void initState() {
@@ -285,7 +286,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
     _blurRadiusAnimation = Tween<double>(begin: 20.0, end: 50.0).animate(_glowController);
     _spreadRadiusAnimation = Tween<double>(begin: 2.0, end: 8.0).animate(_glowController);
 
-    startPreCountdown();
+    // Removed startPreCountdown call from here
   }
 
   @override
@@ -298,7 +299,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
   void startPreCountdown() {
     Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
-        if (preCountdown > 1) {
+        if (preCountdown > 0) {
           preCountdown--;
         } else {
           timer.cancel();
@@ -564,6 +565,15 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                           ),
                         ),
                       ),
+                    if (showInfoOverlay)
+                      InfoOverlay(
+                        onClose: () {
+                          setState(() {
+                            showInfoOverlay = false;
+                            startPreCountdown(); // Start pre-countdown when the user presses "Got it"
+                          });
+                        },
+                      ),
                   ],
                 ),
               ),
@@ -613,6 +623,8 @@ class _PulseEffectState extends State<PulseEffect> with SingleTickerProviderStat
         return Opacity(
           opacity: 1.0 - _animation.value,
           child: Container(
+            width: 200 + 20 * _animation.value, // Adjusted size to be closer to the outer box
+            height: 200 + 20 * _animation.value, // Adjusted size to be closer to the outer box
             decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               border: Border.all(
@@ -623,6 +635,62 @@ class _PulseEffectState extends State<PulseEffect> with SingleTickerProviderStat
           ),
         );
       },
+    );
+  }
+}
+
+class InfoOverlay extends StatelessWidget {
+  final VoidCallback onClose;
+
+  InfoOverlay({required this.onClose});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Container(
+          color: Colors.black.withOpacity(0.7), // Slight transparency
+        ),
+        Center(
+          child: Container(
+            padding: EdgeInsets.all(20),
+            margin: EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Box Breathing Technique',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Box breathing is a simple and effective breathing technique. '
+                  'Follow the instructions on the screen:\n\n'
+                  '1. Inhale when it says "Inhale".\n'
+                  '2. Hold your breath when it says "Hold".\n'
+                  '3. Exhale when it says "Exhale".\n'
+                  '4. Hold your breath again when it says "Hold".\n\n'
+                  'Repeat this cycle to help calm your mind and body.',
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: onClose,
+                  child: Text('Got it!'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
