@@ -388,10 +388,25 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
     });
   }
 
+  String getBreathingPhaseText() {
+    switch (phase) {
+      case 0:
+        return "Inhale";
+      case 1:
+        return "Hold";
+      case 2:
+        return "Exhale";
+      case 3:
+        return "Hold";
+      default:
+        return "";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double cycle = elapsedTime / duration;
-    double textScale = (0.5 - 0.5 * cos(cycle * pi));
+    double textScale = (0.5 - 0.5 * cos(cycle * pi)); // Smooth scaling effect
     double textSize = baseTextSize + (maxTextSize - baseTextSize) * textScale;
 
     return Scaffold(
@@ -410,9 +425,9 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
               Align(
                 alignment: Alignment.topLeft,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 40.0), // Added padding to move the icon lower
+                  padding: const EdgeInsets.only(top: 40.0),
                   child: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.white, size: 36), // Increased icon size
+                    icon: Icon(Icons.arrow_back, color: Colors.white, size: 36),
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -422,13 +437,13 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
               Align(
                 alignment: Alignment.topRight,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 40.0), // Added padding to move the icon lower
+                  padding: const EdgeInsets.only(top: 40.0),
                   child: PopupMenuButton<int>(
-                    icon: Icon(Icons.build, color: Colors.white, size: 36), // Wrench icon
-                    color: Colors.blueGrey.shade900.withOpacity(0.8), // Match the color scheme and make it slightly transparent
+                    icon: Icon(Icons.build, color: Colors.white, size: 36),
+                    color: Colors.blueGrey.shade900.withOpacity(0.8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(color: Colors.white.withOpacity(0.5), width: 1), // Light outline
+                      side: BorderSide(color: Colors.white.withOpacity(0.5), width: 1),
                     ),
                     onSelected: (item) => onSelected(context, item),
                     itemBuilder: (context) => [
@@ -562,6 +577,24 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                             shadows: [
                               Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
                             ],
+                          ),
+                        ),
+                      ),
+                    if (!isPreCountdown)
+                      Align(
+                        alignment: Alignment.topCenter, // Position the text above the box
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 50.0), // Adjust the padding to move it closer to the box
+                          child: Text(
+                            getBreathingPhaseText(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: textSize, // Dynamically scaled text size
+                              fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
+                              ],
+                            ),
                           ),
                         ),
                       ),
