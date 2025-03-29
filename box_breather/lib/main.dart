@@ -648,43 +648,83 @@ class InfoOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // Background with gradient and transparency
         Container(
-          color: Colors.black.withOpacity(0.7), // Slight transparency
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.black.withOpacity(0.8), Colors.blueGrey.shade900.withOpacity(0.8)],
+            ),
+          ),
         ),
         Center(
           child: Container(
             padding: EdgeInsets.all(20),
             margin: EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
+              color: Colors.black.withOpacity(0.9), // Slightly transparent black background
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.blueAccent, width: 2), // Blue border
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Title
                 Text(
                   'Box Breathing Technique',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 5,
+                        color: Colors.blueAccent,
+                        offset: Offset(0, 0),
+                      ),
+                    ],
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 20),
+                // Instructions
                 Text(
                   'Box breathing is a simple and effective breathing technique. '
-                  'Follow the instructions on the screen:\n\n'
+                  'Follow the instructions below:\n\n'
                   '1. Inhale when it says "Inhale".\n'
                   '2. Hold your breath when it says "Hold".\n'
                   '3. Exhale when it says "Exhale".\n'
                   '4. Hold your breath again when it says "Hold".\n\n'
                   'Repeat this cycle to help calm your mind and body.',
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    height: 1.5, // Line height for better readability
+                  ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 30),
+                // "Got it!" Button
                 ElevatedButton(
                   onPressed: onClose,
-                  child: Text('Got it!'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent, // Button background color
+                    foregroundColor: Colors.white, // Button text color
+                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: 5,
+                    shadowColor: Colors.blueAccent.withOpacity(0.5),
+                  ),
+                  child: Text(
+                    'Got it!',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
