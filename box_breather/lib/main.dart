@@ -274,10 +274,12 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
   bool isPreCountdown = true;
   bool showPulse = false;
   bool showInfoOverlay = true; // Show the informational overlay initially
+  bool showBeginText = false; // Show "Begin" text when countdown reaches 1
 
   @override
   void initState() {
     super.initState();
+
     _glowController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
@@ -286,7 +288,17 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
     _blurRadiusAnimation = Tween<double>(begin: 20.0, end: 50.0).animate(_glowController);
     _spreadRadiusAnimation = Tween<double>(begin: 2.0, end: 8.0).animate(_glowController);
 
-    // Removed startPreCountdown call from here
+    // Initialize the red box position to the top-left corner of the outer box
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final centerX = MediaQuery.of(context).size.width / 2;
+      final centerY = MediaQuery.of(context).size.height / 2;
+      final halfOuterBoxSize = outerBoxSize / 2;
+
+      setState(() {
+        positionX = centerX - halfOuterBoxSize;
+        positionY = centerY - halfOuterBoxSize;
+      });
+    });
   }
 
   @override
@@ -299,18 +311,24 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
   void startPreCountdown() {
     Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
-        if (preCountdown > 0) {
+        if (preCountdown > 1) {
           preCountdown--;
-        } else {
-          timer.cancel();
-          isPreCountdown = false;
-          showPulse = true;
-          Future.delayed(Duration(milliseconds: 500), () {
+        } else if (preCountdown == 1) {
+          // Show "Begin" text when the countdown reaches 1
+          showBeginText = true;
+          preCountdown--; // Decrement to 0
+
+          // Hide "Begin" text after 1 second
+          Future.delayed(Duration(seconds: 1), () {
             setState(() {
-              showPulse = false;
+              showBeginText = false;
             });
           });
-          startBreathingAnimation();
+        } else {
+          // Countdown has ended
+          timer.cancel();
+          isPreCountdown = false;
+          startBreathingAnimation(); // Start the breathing animation immediately
         }
       });
     });
@@ -542,6 +560,24 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                             shadows: [
                               Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
                             ],
+                          ),
+                        ),
+                      ),
+                    if (showBeginText)
+                      Align(
+                        alignment: Alignment.topCenter, // Position the text above the box
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 50.0), // Adjust the padding to move it closer to the box
+                          child: Text(
+                            'Begin',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 60,
+                              fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0)),
+                              ],
+                            ),
                           ),
                         ),
                       ),
