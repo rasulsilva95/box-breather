@@ -346,8 +346,6 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
       setState(() {
         double step = (outerBoxSize - minBoxSize) / (duration * 25);
         elapsedTime += 0.04;
-        double progress = elapsedTime / duration;
-        dynamicBoxSize = minBoxSize + (maxBoxSize - minBoxSize) * progress;
         countdown = (elapsedTime ~/ 1) + 1;
 
         double halfOuterBoxSize = outerBoxSize / 2;
@@ -383,7 +381,6 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
             resetCountdown();
             positionX = centerX - halfOuterBoxSize;
             positionY = centerY - halfOuterBoxSize;
-            dynamicBoxSize = minBoxSize;
           }
         }
       });
@@ -568,15 +565,23 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                         alignment: Alignment.topCenter, // Position the text above the box
                         child: Padding(
                           padding: const EdgeInsets.only(top: 50.0), // Adjust the padding to move it closer to the box
-                          child: Text(
-                            'Begin',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 60,
-                              fontWeight: FontWeight.bold,
-                              shadows: [
-                                Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0)),
-                              ],
+                          child: AnimatedOpacity(
+                            opacity: showBeginText ? 1.0 : 0.0, // Fade in when true, fade out when false
+                            duration: Duration(milliseconds: 500), // Duration of the fade effect
+                            child: AnimatedScale(
+                              scale: showBeginText ? 1.0 : 2.0, // Scale up when fading out
+                              duration: Duration(milliseconds: 500), // Match the fade duration
+                              child: Text(
+                                'Begin',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold,
+                                  shadows: [
+                                    Shadow(blurRadius: 100, color: Colors.blueAccent, offset: Offset(0, 0)),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -586,16 +591,16 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                         left: positionX,
                         top: positionY,
                         child: Container(
-                          width: dynamicBoxSize,
-                          height: dynamicBoxSize,
+                          width: minBoxSize, // Fixed size
+                          height: minBoxSize, // Fixed size
                           decoration: BoxDecoration(
                             color: Colors.redAccent,
-                            borderRadius: BorderRadius.circular(4), // Further decreased border radius
+                            borderRadius: BorderRadius.circular(4), // Border radius for rounded corners
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.redAccent.withOpacity(0.7),
-                                blurRadius: 10, // Further decreased blur radius
-                                spreadRadius: 1, // Further decreased spread radius
+                                blurRadius: 10, // Blur radius for shadow
+                                spreadRadius: 1, // Spread radius for shadow
                               ),
                             ],
                           ),
