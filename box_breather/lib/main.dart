@@ -126,27 +126,27 @@ class _MainMenuState extends State<MainMenu> with SingleTickerProviderStateMixin
                     'Box',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 48, // Increased font size
+                      fontSize: 48,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 20), // Added spacing between texts
+                  SizedBox(height: 20),
                   Hero(
                     tag: 'outerBox',
                     child: AnimatedBuilder(
                       animation: _controller,
                       builder: (context, child) {
                         return Container(
-                          width: 200, // Increased width
-                          height: 200, // Increased height
+                          width: 200,
+                          height: 200,
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white, width: 4), // Increased border width
-                            color: Colors.transparent, // No internal color
+                            border: Border.all(color: Colors.white, width: 4),
+                            color: Colors.transparent,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.blueAccent.withOpacity(0.8), // Increased opacity
-                                blurRadius: _blurRadiusAnimation.value, // Animated blur radius
-                                spreadRadius: _spreadRadiusAnimation.value, // Animated spread radius
+                                color: Colors.blueAccent.withOpacity(0.8),
+                                blurRadius: _blurRadiusAnimation.value,
+                                spreadRadius: _spreadRadiusAnimation.value,
                               ),
                             ],
                           ),
@@ -158,7 +158,7 @@ class _MainMenuState extends State<MainMenu> with SingleTickerProviderStateMixin
                                 'Breather',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 36, // Increased font size
+                                  fontSize: 36,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -170,7 +170,7 @@ class _MainMenuState extends State<MainMenu> with SingleTickerProviderStateMixin
                   ),
                 ],
               ),
-              SizedBox(height: 40), // Increased spacing
+              SizedBox(height: 40),
               AnimatedOpacity(
                 opacity: buttonOpacity,
                 duration: Duration(seconds: 1),
@@ -216,12 +216,12 @@ class _AnimatedButtonState extends State<AnimatedButton> with SingleTickerProvid
       builder: (context, child) {
         return ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black, // Button color
-            foregroundColor: Colors.white, // Text color
-            side: BorderSide(color: Colors.blueAccent, width: 4), // Increased outline width
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            side: BorderSide(color: Colors.blueAccent, width: 4),
             shadowColor: Colors.blueAccent.withOpacity(0.5),
             elevation: _animation.value,
-            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20), // Increased padding
+            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
           ),
           onPressed: () {
             Navigator.push(
@@ -231,7 +231,7 @@ class _AnimatedButtonState extends State<AnimatedButton> with SingleTickerProvid
                 transitionsBuilder: (context, animation, secondaryAnimation, child) {
                   return SlideTransition(
                     position: Tween<Offset>(
-                      begin: Offset(0.0, 0.5), // Slide in from below
+                      begin: Offset(0.0, 0.5),
                       end: Offset(0.0, 0.0),
                     ).animate(animation),
                     child: child,
@@ -242,7 +242,7 @@ class _AnimatedButtonState extends State<AnimatedButton> with SingleTickerProvid
           },
           child: Text(
             'Breathe',
-            style: TextStyle(fontSize: 24), // Increased font size
+            style: TextStyle(fontSize: 24),
           ),
         );
       },
@@ -258,29 +258,30 @@ class BoxBreathingScreen extends StatefulWidget {
 class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProviderStateMixin {
   double positionX = 0;
   double positionY = 0;
-  double dynamicBoxSize = 10; // Further decreased initial size
-  static const double outerBoxSize = 200; // Further decreased outer box size
+  double dynamicBoxSize = 10;
+  static const double outerBoxSize = 200;
   int phase = 0;
   int countdown = 1;
   late Timer timer;
-  int duration = 4; // Default duration is 4 seconds
-  static const double minBoxSize = 10; // Further decreased min box size
-  static const double maxBoxSize = 20; // Further decreased max box size
-  static const double lineThickness = 3; // Further decreased line thickness
+  int duration = 4;
+  static const double minBoxSize = 10;
+  static const double maxBoxSize = 20;
+  static const double lineThickness = 3;
   double elapsedTime = 0;
-  double baseTextSize = 30; // Further decreased base text size
-  double maxTextSize = 45; // Further decreased max text size
+  double baseTextSize = 30;
+  double maxTextSize = 45;
   late AnimationController _glowController;
   late Animation<double> _blurRadiusAnimation;
   late Animation<double> _spreadRadiusAnimation;
   late AnimationController _textGlowController;
   late Animation<double> _textGlowAnimation;
-  int preCountdown = 3; // Initial countdown value
+  int preCountdown = 3;
   bool isPreCountdown = true;
   bool showPulse = false;
-  bool showInfoOverlay = true; // Show the informational overlay initially
-  bool showBeginText = false; // Show "Begin" text when countdown reaches 1
-  bool showGetReadyText = false; 
+  bool showInfoOverlay = true;
+  bool showBeginText = false;
+  bool showGetReadyText = false;
+
   @override
   void initState() {
     super.initState();
@@ -293,9 +294,8 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
     _blurRadiusAnimation = Tween<double>(begin: 20.0, end: 50.0).animate(_glowController);
     _spreadRadiusAnimation = Tween<double>(begin: 2.0, end: 8.0).animate(_glowController);
 
-    // Initialize the text glow animation
     _textGlowController = AnimationController(
-      duration: const Duration(seconds: 1), // Pulse every second
+      duration: const Duration(seconds: 1),
       vsync: this,
     )..repeat(reverse: true);
 
@@ -303,7 +303,6 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
       CurvedAnimation(parent: _textGlowController, curve: Curves.easeInOut),
     );
 
-    // Initialize the red box position to the top-left corner of the outer box
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final centerX = MediaQuery.of(context).size.width / 2;
       final centerY = MediaQuery.of(context).size.height / 2;
@@ -330,23 +329,22 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
         if (preCountdown > 1) {
           preCountdown--;
           showGetReadyText = true;
+          print('showGetReadyText: $showGetReadyText');
         } else if (preCountdown == 1) {
-          // Show "Begin" text when the countdown reaches 1
           showGetReadyText = false;
           showBeginText = true;
-          preCountdown--; // Decrement to 0
+          print('showGetReadyText: $showGetReadyText, showBeginText: $showBeginText');
+          preCountdown--;
 
-          // Hide "Begin" text after 1 second
           Future.delayed(Duration(seconds: 1), () {
             setState(() {
               showBeginText = false;
             });
           });
         } else {
-          // Countdown has ended
           timer.cancel();
           isPreCountdown = false;
-          startBreathingAnimation(); // Start the breathing animation immediately
+          startBreathingAnimation();
         }
       });
     });
@@ -438,6 +436,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
 
   @override
   Widget build(BuildContext context) {
+    print('Building widget... showGetReadyText: $showGetReadyText');
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -569,52 +568,60 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
                             fontSize: 60,
                             fontWeight: FontWeight.bold,
                             shadows: [
-                              Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
+                              Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0)),
                             ],
                           ),
                         ),
                       ),
-                    if (showGetReadyText)
-                      Align(
-                        alignment: Alignment.topCenter, // Position the text above the box
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 100.0), // Adjust the padding to move it closer to the box
-                          child: AnimatedOpacity(
-                            opacity: showGetReadyText ? 1.0 : 0.0, // Fade in when true, fade out when false
-                            duration: Duration(milliseconds: 500), // Duration of the fade effect
-                            child: Text(
-                              'Get Ready',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                                shadows: [
-                                  Shadow(blurRadius: 100, color: Colors.blueAccent, offset: Offset(0, 0)),
-                                ],
-                              ),
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 100.0),
+                        child: AnimatedOpacity(
+                          opacity: showGetReadyText ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeInOut,
+                          child: Text(
+                            'Get Ready',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(blurRadius: 100, color: Colors.blueAccent, offset: Offset(0, 0)),
+                              ],
                             ),
                           ),
                         ),
                       ),
+                    ),
                     if (showBeginText)
                       Align(
-                        alignment: Alignment.topCenter, // Position the text above the box
+                        alignment: Alignment.topCenter,
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 100.0), // Adjust the padding to move it closer to the box
-                          child: AnimatedOpacity(
-                            opacity: showBeginText ? 1.0 : 0.0, // Fade in when true, fade out when false
-                            duration: Duration(milliseconds: 500), // Duration of the fade effect
-                            child: Text(
-                              'Begin',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                                shadows: [
-                                  Shadow(blurRadius: 100, color: Colors.blueAccent, offset: Offset(0, 0)),
-                                ],
-                              ),
-                            ),
+                          padding: const EdgeInsets.only(top: 100.0),
+                          child: AnimatedSwitcher(
+                            duration: Duration(milliseconds: 300),
+                            transitionBuilder: (Widget child, Animation<double> animation) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                            child: showBeginText
+                                ? Text(
+                                    'Begin',
+                                    key: ValueKey<bool>(showBeginText),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold,
+                                      shadows: [
+                                        Shadow(blurRadius: 100, color: Colors.blueAccent, offset: Offset(0, 0)),
+                                      ],
+                                    ),
+                                  )
+                                : SizedBox.shrink(),
                           ),
                         ),
                       ),
@@ -623,16 +630,16 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
                         left: positionX,
                         top: positionY,
                         child: Container(
-                          width: minBoxSize, // Fixed size
-                          height: minBoxSize, // Fixed size
+                          width: minBoxSize,
+                          height: minBoxSize,
                           decoration: BoxDecoration(
                             color: Colors.redAccent,
-                            borderRadius: BorderRadius.circular(4), // Border radius for rounded corners
+                            borderRadius: BorderRadius.circular(4),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.redAccent.withOpacity(0.7),
-                                blurRadius: 10, // Blur radius for shadow
-                                spreadRadius: 1, // Spread radius for shadow
+                                blurRadius: 10,
+                                spreadRadius: 1,
                               ),
                             ],
                           ),
@@ -644,8 +651,8 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
                         child: Text(
                           '$countdown',
                           style: TextStyle(
-                            color: Colors.white, // Changed to white
-                            fontSize: 60, // Increased font size
+                            color: Colors.white,
+                            fontSize: 60,
                             fontWeight: FontWeight.bold,
                             shadows: [
                               Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
@@ -655,27 +662,27 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
                       ),
                     if (!isPreCountdown)
                       Align(
-                        alignment: Alignment.topCenter, // Position the text above the box
+                        alignment: Alignment.topCenter,
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 100.0), // Adjust the padding to match the action words
+                          padding: const EdgeInsets.only(top: 100.0),
                           child: AnimatedSwitcher(
-                            duration: Duration(milliseconds: 300), // Faster transition duration
+                            duration: Duration(milliseconds: 300),
                             transitionBuilder: (Widget child, Animation<double> animation) {
                               return FadeTransition(
-                                opacity: animation, // Apply fade transition
+                                opacity: animation,
                                 child: child,
                               );
                             },
                             child: Text(
                               getBreathingPhaseText(),
-                              key: ValueKey<String>(getBreathingPhaseText()), // Unique key for each phase
+                              key: ValueKey<String>(getBreathingPhaseText()),
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 40, // Fixed size
+                                fontSize: 40,
                                 fontWeight: FontWeight.bold,
                                 shadows: [
                                   Shadow(
-                                    blurRadius: _textGlowAnimation.value, // Glow intensity based on animation
+                                    blurRadius: _textGlowAnimation.value,
                                     color: Colors.blueAccent,
                                     offset: Offset(0, 0),
                                   ),
@@ -690,7 +697,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
                         onClose: () {
                           setState(() {
                             showInfoOverlay = false;
-                            startPreCountdown(); // Start pre-countdown when the user presses "Got it"
+                            startPreCountdown();
                           });
                         },
                       ),
@@ -705,7 +712,6 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
   }
 
   void onSelected(BuildContext context, int item) {
-    // Handle menu item selection
   }
 }
 
@@ -743,8 +749,8 @@ class _PulseEffectState extends State<PulseEffect> with TickerProviderStateMixin
         return Opacity(
           opacity: 1.0 - _animation.value,
           child: Container(
-            width: 200 + 20 * _animation.value, // Adjusted size to be closer to the outer box
-            height: 200 + 20 * _animation.value, // Adjusted size to be closer to the outer box
+            width: 200 + 20 * _animation.value,
+            height: 200 + 20 * _animation.value,
             decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               border: Border.all(
@@ -768,7 +774,6 @@ class InfoOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Background with gradient and transparency
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -783,14 +788,13 @@ class InfoOverlay extends StatelessWidget {
             padding: EdgeInsets.all(20),
             margin: EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.9), // Slightly transparent black background
+              color: Colors.black.withOpacity(0.9),
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.blueAccent, width: 2), // Blue border
+              border: Border.all(color: Colors.blueAccent, width: 2),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Title
                 Text(
                   'Box Breathing Technique',
                   style: TextStyle(
@@ -808,7 +812,6 @@ class InfoOverlay extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 20),
-                // Instructions
                 Text(
                   'Box breathing is a simple and effective breathing technique. '
                   'Follow the instructions below:\n\n'
@@ -820,17 +823,16 @@ class InfoOverlay extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.white,
-                    height: 1.5, // Line height for better readability
+                    height: 1.5,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 30),
-                // "Got it!" Button
                 ElevatedButton(
                   onPressed: onClose,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent, // Button background color
-                    foregroundColor: Colors.white, // Button text color
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
