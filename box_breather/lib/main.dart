@@ -229,8 +229,11 @@ class _AnimatedButtonState extends State<AnimatedButton> with SingleTickerProvid
               PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) => BoxBreathingScreen(),
                 transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                  return FadeTransition(
-                    opacity: animation,
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: Offset(0.0, 0.5), // Slide in from below
+                      end: Offset(0.0, 0.0),
+                    ).animate(animation),
                     child: child,
                   );
                 },
@@ -638,20 +641,30 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
                       Align(
                         alignment: Alignment.topCenter, // Position the text above the box
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 100.0), // Adjust the padding to move it closer to the box
-                          child: Text(
-                            getBreathingPhaseText(),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 40, // Fixed size
-                              fontWeight: FontWeight.bold,
-                              shadows: [
-                                Shadow(
-                                  blurRadius: _textGlowAnimation.value, // Glow intensity based on animation
-                                  color: Colors.blueAccent,
-                                  offset: Offset(0, 0),
-                                ),
-                              ],
+                          padding: const EdgeInsets.only(top: 100.0), // Adjust the padding to match the action words
+                          child: AnimatedSwitcher(
+                            duration: Duration(milliseconds: 300), // Faster transition duration
+                            transitionBuilder: (Widget child, Animation<double> animation) {
+                              return FadeTransition(
+                                opacity: animation, // Apply fade transition
+                                child: child,
+                              );
+                            },
+                            child: Text(
+                              getBreathingPhaseText(),
+                              key: ValueKey<String>(getBreathingPhaseText()), // Unique key for each phase
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 40, // Fixed size
+                                fontWeight: FontWeight.bold,
+                                shadows: [
+                                  Shadow(
+                                    blurRadius: _textGlowAnimation.value, // Glow intensity based on animation
+                                    color: Colors.blueAccent,
+                                    offset: Offset(0, 0),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
