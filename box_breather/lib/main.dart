@@ -280,7 +280,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
   bool showPulse = false;
   bool showInfoOverlay = true; // Show the informational overlay initially
   bool showBeginText = false; // Show "Begin" text when countdown reaches 1
-
+  bool showGetReadyText = false; 
   @override
   void initState() {
     super.initState();
@@ -329,8 +329,10 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
       setState(() {
         if (preCountdown > 1) {
           preCountdown--;
+          showGetReadyText = true;
         } else if (preCountdown == 1) {
           // Show "Begin" text when the countdown reaches 1
+          showGetReadyText = false;
           showBeginText = true;
           preCountdown--; // Decrement to 0
 
@@ -436,10 +438,6 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
 
   @override
   Widget build(BuildContext context) {
-    double cycle = elapsedTime / duration;
-    double textScale = (0.5 - 0.5 * cos(cycle * pi)); // Smooth scaling effect
-    double textSize = baseTextSize + (maxTextSize - baseTextSize) * textScale;
-
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -576,6 +574,28 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
                           ),
                         ),
                       ),
+                    if (showGetReadyText)
+                      Align(
+                        alignment: Alignment.topCenter, // Position the text above the box
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 100.0), // Adjust the padding to move it closer to the box
+                          child: AnimatedOpacity(
+                            opacity: showGetReadyText ? 1.0 : 0.0, // Fade in when true, fade out when false
+                            duration: Duration(milliseconds: 500), // Duration of the fade effect
+                            child: Text(
+                              'Get Ready',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                                shadows: [
+                                  Shadow(blurRadius: 100, color: Colors.blueAccent, offset: Offset(0, 0)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     if (showBeginText)
                       Align(
                         alignment: Alignment.topCenter, // Position the text above the box
@@ -584,19 +604,15 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
                           child: AnimatedOpacity(
                             opacity: showBeginText ? 1.0 : 0.0, // Fade in when true, fade out when false
                             duration: Duration(milliseconds: 500), // Duration of the fade effect
-                            child: AnimatedScale(
-                              scale: showBeginText ? 1.0 : 2.0, // Scale up when fading out
-                              duration: Duration(milliseconds: 500), // Match the fade duration
-                              child: Text(
-                                'Begin',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.bold,
-                                  shadows: [
-                                    Shadow(blurRadius: 100, color: Colors.blueAccent, offset: Offset(0, 0)),
-                                  ],
-                                ),
+                            child: Text(
+                              'Begin',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                                shadows: [
+                                  Shadow(blurRadius: 100, color: Colors.blueAccent, offset: Offset(0, 0)),
+                                ],
                               ),
                             ),
                           ),
