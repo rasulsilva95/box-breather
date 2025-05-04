@@ -331,11 +331,20 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProv
           showGetReadyText = true;
           print('showGetReadyText: $showGetReadyText');
         } else if (preCountdown == 1) {
-          showGetReadyText = false;
-          showBeginText = true;
-          print('showGetReadyText: $showGetReadyText, showBeginText: $showBeginText');
+          // Start fading out "Get Ready" early to avoid overlap
+          Future.delayed(Duration(milliseconds: 200), () {
+            setState(() {
+              showGetReadyText = false;
+              print('showGetReadyText: $showGetReadyText');
+            });
+          });
+          Future.delayed(Duration(milliseconds: 500), () {
+            setState(() {
+              showBeginText = true;
+              print('showBeginText: $showBeginText');
+            });
+          });
           preCountdown--;
-
           Future.delayed(Duration(seconds: 1), () {
             setState(() {
               showBeginText = false;
