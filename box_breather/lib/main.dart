@@ -252,7 +252,7 @@ class BoxBreathingScreen extends StatefulWidget {
   _BoxBreathingScreenState createState() => _BoxBreathingScreenState();
 }
 
-class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTickerProviderStateMixin {
+class _BoxBreathingScreenState extends State<BoxBreathingScreen> with TickerProviderStateMixin {
   double positionX = 0;
   double positionY = 0;
   double dynamicBoxSize = 10; // Further decreased initial size
@@ -270,6 +270,8 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
   late AnimationController _glowController;
   late Animation<double> _blurRadiusAnimation;
   late Animation<double> _spreadRadiusAnimation;
+  late AnimationController _textGlowController;
+  late Animation<double> _textGlowAnimation;
   int preCountdown = 3; // Initial countdown value
   bool isPreCountdown = true;
   bool showPulse = false;
@@ -288,6 +290,16 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
     _blurRadiusAnimation = Tween<double>(begin: 20.0, end: 50.0).animate(_glowController);
     _spreadRadiusAnimation = Tween<double>(begin: 2.0, end: 8.0).animate(_glowController);
 
+    // Initialize the text glow animation
+    _textGlowController = AnimationController(
+      duration: const Duration(seconds: 1), // Pulse every second
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _textGlowAnimation = Tween<double>(begin: 5.0, end: 20.0).animate(
+      CurvedAnimation(parent: _textGlowController, curve: Curves.easeInOut),
+    );
+
     // Initialize the red box position to the top-left corner of the outer box
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final centerX = MediaQuery.of(context).size.width / 2;
@@ -304,6 +316,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
   @override
   void dispose() {
     _glowController.dispose();
+    _textGlowController.dispose();
     timer.cancel();
     super.dispose();
   }
@@ -564,7 +577,7 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                       Align(
                         alignment: Alignment.topCenter, // Position the text above the box
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 50.0), // Adjust the padding to move it closer to the box
+                          padding: const EdgeInsets.only(top: 100.0), // Adjust the padding to move it closer to the box
                           child: AnimatedOpacity(
                             opacity: showBeginText ? 1.0 : 0.0, // Fade in when true, fade out when false
                             duration: Duration(milliseconds: 500), // Duration of the fade effect
@@ -625,15 +638,19 @@ class _BoxBreathingScreenState extends State<BoxBreathingScreen> with SingleTick
                       Align(
                         alignment: Alignment.topCenter, // Position the text above the box
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 50.0), // Adjust the padding to move it closer to the box
+                          padding: const EdgeInsets.only(top: 100.0), // Adjust the padding to move it closer to the box
                           child: Text(
                             getBreathingPhaseText(),
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: textSize, // Dynamically scaled text size
+                              fontSize: 40, // Fixed size
                               fontWeight: FontWeight.bold,
                               shadows: [
-                                Shadow(blurRadius: 10, color: Colors.blueAccent, offset: Offset(0, 0))
+                                Shadow(
+                                  blurRadius: _textGlowAnimation.value, // Glow intensity based on animation
+                                  color: Colors.blueAccent,
+                                  offset: Offset(0, 0),
+                                ),
                               ],
                             ),
                           ),
@@ -668,7 +685,7 @@ class PulseEffect extends StatefulWidget {
   _PulseEffectState createState() => _PulseEffectState();
 }
 
-class _PulseEffectState extends State<PulseEffect> with SingleTickerProviderStateMixin {
+class _PulseEffectState extends State<PulseEffect> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
