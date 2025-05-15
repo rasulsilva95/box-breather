@@ -116,68 +116,84 @@ class _MainMenuState extends State<MainMenu> with SingleTickerProviderStateMixin
             colors: [Colors.black, Colors.blueGrey.shade900],
           ),
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
+        child: Stack(
+          children: [
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Box',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Hero(
-                    tag: 'outerBox',
-                    child: AnimatedBuilder(
-                      animation: _controller,
-                      builder: (context, child) {
-                        return Container(
-                          width: 200,
-                          height: 200,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white, width: 4),
-                            color: Colors.transparent,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.blueAccent.withOpacity(0.8),
-                                blurRadius: _blurRadiusAnimation.value,
-                                spreadRadius: _spreadRadiusAnimation.value,
+                  Column(
+                    children: [
+                      Text(
+                        'Box',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Hero(
+                        tag: 'outerBox',
+                        child: AnimatedBuilder(
+                          animation: _controller,
+                          builder: (context, child) {
+                            return Container(
+                              width: 200,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.white, width: 4),
+                                color: Colors.transparent,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.blueAccent.withOpacity(0.8),
+                                    blurRadius: _blurRadiusAnimation.value,
+                                    spreadRadius: _spreadRadiusAnimation.value,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: Center(
-                            child: AnimatedOpacity(
-                              opacity: breatherOpacity,
-                              duration: Duration(seconds: 1),
-                              child: Text(
-                                'Breather',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.bold,
+                              child: Center(
+                                child: AnimatedOpacity(
+                                  opacity: breatherOpacity,
+                                  duration: Duration(seconds: 1),
+                                  child: Text(
+                                    'Breather',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 36,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 40),
+                  AnimatedOpacity(
+                    opacity: buttonOpacity,
+                    duration: Duration(seconds: 1),
+                    child: AnimatedButton(),
                   ),
                 ],
               ),
-              SizedBox(height: 40),
-              AnimatedOpacity(
-                opacity: buttonOpacity,
-                duration: Duration(seconds: 1),
-                child: AnimatedButton(),
+            ),
+            Positioned(
+              bottom: 20, // Position near the bottom
+              right: 20, // Align to the right
+              child: Text(
+                'v1.0.0',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7), // Slightly transparent
+                  fontSize: 14, // Small font size
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
